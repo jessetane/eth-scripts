@@ -7,27 +7,42 @@ export default async function watchTx (promise, _provider) {
   try {
     let txRes = await promise
     if (txRes && typeof txRes.wait === 'function') {
-      await txRes.wait()
+      return await txRes.wait()
     } else {
       return txRes
     }
   } catch (err) {
     let reason = null
-    if (err.error) {
-      // node error
-      throw err.error.error
-    } else if (err.transaction) {
-      // on chain error
+    if (err.code === 'UNPREDICTABLE_GAS_LIMIT') {
+      reason = err.reason
+    } else if (err.receipt) {
       reason = await getRevertReason(err.transaction, provider)
-    } else if (err.body) {
-      // 1?
-      console.error('watchTx.js: unknown error 1', err)
-      reason = JSON.parse(err.body).error.message
+    } else {
+      throw err
+    }
+    /*
+    if (err.error && err.error.error) {
+      // node error
+      if (err.code === 'UNPREDICTABLE_GAS_LIMIT') {
+        reason = err.reason
+      } else {
+        // console.log('node error?')
+        throw err.error.error
+      }
+    } else if (err.error) {
+      // wallet error
+      // console.log('wallet error?')
+      throw err.error
+    } else if (err.receipt) {
+      // on chain error
+      // console.log('chain error?')
+      reason = await getRevertReason(err.transaction, provider)
     } else {
       // 2?
       console.error('watchTx.js: unknown error 2', err)
       reason = err.message
     }
+    */
     throw new Error(reason)
   }
 }

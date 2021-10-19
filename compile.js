@@ -8,8 +8,7 @@ export default async function compile (compilerPath, standardInputJson) {
     p.on('error', err => { rej(err) })
     p.on('close', code => {
       let output = JSON.parse(stdout)
-      let errors = (output.errors || []).filter(e => e.type !== 'Warning')
-      if (errors.length) {
+      if (output.errors) {
         const err = new Error('compilation failed')
         err.data = output
         rej(err)

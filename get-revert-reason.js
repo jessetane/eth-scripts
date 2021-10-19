@@ -15,6 +15,7 @@ export default async function getRevertReason (tx, _provider) {
     }
   } catch (err) {
     if (err.error && err.error.body) {
+      // return err.reason
       return JSON.parse(err.error.body).error.message
     } else {
       return err.message

@@ -8,15 +8,21 @@ process.on('exit', () => {
 
 export default function spawnGeth (exe, opts = {}) {  
   return new Promise((res, rej) => {
+    const datadir = `${opts.datadir || 'var'}`
     const gethOpts = [
       '--http',
       '--http.api=web3,eth,debug,personal,net',
       '--allow-insecure-unlock',
+      `--datadir=${datadir}`,
       '--dev',
-      `--datadir=${opts.datadir || 'var'}`,
-      '--rpcvhosts=*',
+      '--dev.period=0',
+      `--dev.gaslimit=${opts.gasLimit || '11500000'}`,
+      `--miner.gaslimit=${opts.gasLimit || '11500000'}`,
+      `--rpc.gascap=${opts.gasCap || 0}`,
+      `--rpc.txfeecap=0`,
       `--http.port=${opts.port || '8545'}`,
-      '--http.corsdomain=*'
+      '--http.corsdomain=*',
+      '--nodiscover'
     ]
     const geth = childProcess.spawn(exe, gethOpts)
     geth.stderr.on('data', d => {
@@ -25,14 +31,15 @@ export default function spawnGeth (exe, opts = {}) {
         process.stderr.write(d)
       }
       if (geth.ready) return
-      if (d.indexOf('waiting for transactions') !== -1) {
+      if (d.indexOf('Commit new mining work') !== -1) {
         geth.ready = true
         res(geth)
       }
     })
     geth.on('exit', code => {
-      if (geth.done) return
-      geth.emit('error', new Error('geth crashed with code: ' + code))
+      if (!geth.done) {
+        geth.emit('error', new Error('geth crashed with code: ' + code))
+      }
     })
     geth.close = function () {
       geths = geths.filter(g => g !== geth)
