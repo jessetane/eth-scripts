@@ -1,0 +1,9 @@
+{
+  "name": "eth-tools",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "^5.4.7"
+  }
+}
