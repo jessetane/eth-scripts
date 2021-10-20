@@ -8,7 +8,8 @@ export default async function compile (compilerPath, standardInputJson) {
     p.on('error', err => { rej(err) })
     p.on('close', code => {
       let output = JSON.parse(stdout)
-      if (output.errors) {
+      let errors = (output.errors || []).filter(e => e.type !== 'Warning')
+      if (errors.length) {
         const err = new Error('compilation failed')
         err.data = output
         rej(err)
@@ -21,6 +22,18 @@ export default async function compile (compilerPath, standardInputJson) {
     }
     if (!standardInputJson.settings) {
       standardInputJson.settings = compile.defaultSettings
+    }
+    for (var key in standardInputJson.sources) {
+      var source = standardInputJson.sources[key]
+      if (!source || typeof source !== 'object') {
+        standardInputJson.sources[key] = source = {}
+      }
+      if (!source.urls) {
+        source.urls = []
+      }
+      if (!source.urls.length) {
+        source.urls.push(key)
+      }
     }
     p.stdin.end(JSON.stringify(standardInputJson))
   })
