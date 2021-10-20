@@ -2,7 +2,7 @@ import childProcess from 'child_process'
 
 export default async function compile (compilerPath, standardInputJson) {
   return new Promise((res, rej) => {
-    const p = childProcess.spawn(compilerPath, [ '--standard-json', `--allow-paths=.,..` ])
+    const p = childProcess.spawn(compilerPath, [ '--standard-json', '--allow-paths=.' ])
     let stdout = ''
     p.stdout.on('data', data => stdout += data)
     p.on('error', err => { rej(err) })
