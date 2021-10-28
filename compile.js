@@ -1,45 +1,6 @@
 import childProcess from 'child_process'
 
-export default async function compile (compilerPath, standardInputJson) {
-  return new Promise((res, rej) => {
-    const p = childProcess.spawn(compilerPath, [ '--standard-json', '--allow-paths=.' ])
-    let stdout = ''
-    p.stdout.on('data', data => stdout += data)
-    p.on('error', err => { rej(err) })
-    p.on('close', code => {
-      let output = JSON.parse(stdout)
-      let errors = (output.errors || []).filter(e => e.type !== 'Warning')
-      if (errors.length) {
-        const err = new Error('compilation failed')
-        err.data = output
-        rej(err)
-      } else {
-        res(output)
-      }
-    })
-    if (!standardInputJson.language) {
-      standardInputJson.language = 'Solidity'
-    }
-    if (!standardInputJson.settings) {
-      standardInputJson.settings = compile.defaultSettings
-    }
-    for (var key in standardInputJson.sources) {
-      var source = standardInputJson.sources[key]
-      if (!source || typeof source !== 'object') {
-        standardInputJson.sources[key] = source = {}
-      }
-      if (!source.urls) {
-        source.urls = []
-      }
-      if (!source.urls.length) {
-        source.urls.push(key)
-      }
-    }
-    p.stdin.end(JSON.stringify(standardInputJson))
-  })
-}
-
-compile.defaultSettings = {
+const defaultSettings = {
   remappings: [
     '@openzeppelin=node_modules/@openzeppelin'
   ],
@@ -56,3 +17,50 @@ compile.defaultSettings = {
     }
   }
 }
+
+async function compile (pathToSolcExecutable, standardInputJson) {
+  return new Promise((res, rej) => {
+    const p = childProcess.spawn(pathToSolcExecutable, [ '--standard-json', '--allow-paths=.' ])
+    let stdout = ''
+    p.stdout.on('data', data => stdout += data)
+    p.on('error', err => { rej(err) })
+    p.on('close', code => {
+      const output = JSON.parse(stdout)
+      const errors = (output.errors || []).filter(e => e.type !== 'Warning')
+      if (errors.length) {
+        const err = new Error('compilation failed')
+        err.data = output
+        rej(err)
+      } else {
+        res(output)
+      }
+    })
+    p.stdin.end(JSON.stringify(normalizeInput(standardInputJson)))
+  })
+}
+
+function normalizeInput (input) {
+  if (!input.language) {
+    input.language = 'Solidity'
+  }
+  if (!input.settings) {
+    input.settings = defaultSettings
+  }
+  for (var key in input.sources) {
+    var source = input.sources[key]
+    if (!source || typeof source !== 'object') {
+      input.sources[key] = source = {}
+    }
+    if (!source.urls) {
+      source.urls = []
+    }
+    if (!source.urls.length) {
+      source.urls.push(key)
+    }
+  }
+  return input
+}
+
+compile.defaultSettings = defaultSettings
+
+export default compile

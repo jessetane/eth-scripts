@@ -1,10 +1,12 @@
-import { ethers } from 'ethers'
+import config from './config.js'
 
-const abiEncoder = new ethers.utils.AbiCoder()
+let abiEncoder = null
 
 export default function encodeConstructorArgs (abi, args = []) {
   const constructor = abi.find(m => m.type === 'constructor')
-  if (constructor) {
-    return abiEncoder.encode(constructor.inputs, args).slice(2)
+  if (!constructor) return ''
+  if (!abiEncoder) {
+    abiEncoder = new config.ethers.utils.AbiCoder()
   }
+  return abiEncoder.encode(constructor.inputs, args).slice(2)
 }

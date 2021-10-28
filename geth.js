@@ -6,7 +6,7 @@ process.on('exit', () => {
   geths.forEach(geth => geth.close())
 })
 
-export default function spawnGeth (exe, opts = {}) {  
+function spawnGeth (exe, opts = {}) {
   return new Promise((res, rej) => {
     const datadir = `${opts.datadir || 'var'}`
     const gethOpts = [
@@ -16,7 +16,7 @@ export default function spawnGeth (exe, opts = {}) {
       `--datadir=${datadir}`,
       '--dev',
       '--dev.period=0',
-      `--dev.gaslimit=${opts.gasLimit || '11500000'}`,
+      //`--dev.gaslimit=${opts.gasLimit || '11500000'}`,
       `--miner.gaslimit=${opts.gasLimit || '11500000'}`,
       `--rpc.gascap=${opts.gasCap || 0}`,
       `--rpc.txfeecap=0`,
@@ -49,3 +49,5 @@ export default function spawnGeth (exe, opts = {}) {
     geths.push(geth)
   })
 }
+
+export default spawnGeth
