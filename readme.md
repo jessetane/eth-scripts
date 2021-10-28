@@ -96,7 +96,7 @@ import getRevertReason from 'eth-tools/get-revert-reason.js'
 
 const tx = templates.MyContract.contract.someMethodThatModifiesState()
 await tx // assume transaction is sent and mined but reverts on chain
-const reason = getRevertReason(tx.hash)
+const reason = getRevertReason(tx)
 ```
 
 ### Encoding constructor arguments
