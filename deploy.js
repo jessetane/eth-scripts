@@ -14,7 +14,7 @@ async function deploy (deployer, templates) {
     if (template.address) {
       template.contract = new config.ethers.Contract(template.address, abi, deployer)
     } else {
-      template.contract = await factory.deploy(...(template.args || []), { gasLimit: template.gasLimit || 9999999 })
+      template.contract = await factory.deploy(...(template.args || []), { gasLimit: template.gasLimit })
       await watchTx(template.contract.deployTransaction)
     }
     if (template.postDeploy) {
