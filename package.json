@@ -2,6 +2,10 @@
   "name": "eth-tools",
   "version": "1.2.0",
   "type": "module",
+  "bin": {
+    "download-geth": "download-geth.sh",
+    "download-solc": "download-solc.sh"
+  },
   "author": "jesse.tane@gmail.com",
   "license": "MIT"
 }
