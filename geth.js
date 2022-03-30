@@ -31,7 +31,7 @@ function spawnGeth (exe, opts = {}) {
         process.stderr.write(d)
       }
       if (geth.ready) return
-      if (d.indexOf('Commit new mining work') !== -1) {
+      if (d.indexOf('Commit new ') !== -1) {
         geth.ready = true
         res(geth)
       }
