@@ -1,5 +1,5 @@
 {
-  "name": "eth-tools",
+  "name": "eth-scripts",
   "version": "1.3.0",
   "type": "module",
   "bin": {

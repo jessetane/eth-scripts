@@ -6,13 +6,17 @@ const defaultSettings = {
   ],
   optimizer: {
     enabled: true,
-    runs: 200
+    runs: 1000000
+  },
+  metadata: {
+    bytecodeHash: 'none'
   },
   outputSelection: {
     '*': {
       '*': [
         'abi',
-        'evm.bytecode.object'
+        'evm.bytecode.object',
+        'metadata'
       ]
     }
   }
@@ -40,6 +44,13 @@ async function compile (pathToSolcExecutable, standardInputJson) {
 }
 
 function normalizeInput (input) {
+  if (typeof input === 'string') {
+    input = {
+      sources: {
+        [input]: {}
+      }
+    }
+  }
   if (!input.language) {
     input.language = 'Solidity'
   }

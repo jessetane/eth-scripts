@@ -10,9 +10,6 @@ function spawnGeth (exe, opts = {}) {
   return new Promise((res, rej) => {
     const datadir = `${opts.datadir || 'var'}`
     const gethOpts = [
-      '--http',
-      '--http.api=web3,eth,debug,personal,net',
-      '--allow-insecure-unlock',
       `--datadir=${datadir}`,
       '--dev',
       '--dev.period=0',
@@ -20,8 +17,11 @@ function spawnGeth (exe, opts = {}) {
       `--miner.gaslimit=${opts.gasLimit || '11500000'}`,
       `--rpc.gascap=${opts.gasCap || 0}`,
       `--rpc.txfeecap=0`,
+      '--http',
+      '--http.api=eth',
+      `--http.addr=${opts.host || '127.0.0.1'}`,
       `--http.port=${opts.port || '8545'}`,
-      '--http.corsdomain=*',
+      `--http.corsdomain=*`,
       '--nodiscover'
     ]
     const geth = childProcess.spawn(exe, gethOpts)
@@ -44,7 +44,7 @@ function spawnGeth (exe, opts = {}) {
     geth.close = function () {
       geths = geths.filter(g => g !== geth)
       geth.done = true
-      geth.kill()
+      geth.kill('SIGINT')
     }
     geths.push(geth)
   })

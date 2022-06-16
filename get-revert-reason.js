@@ -1,26 +1,30 @@
-import config from './config.js'
+const utf8 = new TextDecoder()
 
-async function getRevertReason (tx) {
+async function getRevertReason (provider, tx) {
   tx = Object.assign({}, tx)
   delete tx.gasPrice
   delete tx.maxFeePerGas
   delete tx.maxPriorityFeePerGas
+  let ret = ''
   try {
-    var ret = await config.provider.call(tx)
-    if (ret === '0x') {
-      throw new Error('no revert reason found')
-    }
+    ret = await provider.call(tx)
   } catch (err) {
-    if (err.error && err.error.body) {
-      // return err.reason
-      return JSON.parse(err.error.body).error.message
-    } else {
-      return err.message
-    }
+    // try to make ethers call errors consistent with estimateGas
+    if (err.data === '0x') return ''
+    throw err
   }
-  const stringLength = config.ethers.BigNumber.from(`0x${ret.slice(2 + 4 * 2 + 32 * 2).slice(0, 32 * 2)}`).toNumber()
-  const reason = `0x${ret.substr(138).slice(0, stringLength * 2)}`
-  return config.ethers.utils.toUtf8String(reason)
+  // https://github.com/ethers-io/ethers.js/issues/949
+  // geth returns the decoded revert reason string as an error
+  // but ethers removes it, so we decode the raw response here
+  const stringLength = parseInt(ret.substr(2 + 4 * 2 + 32 * 2, 32 * 2), 16)
+  const buffer = new Uint8Array(stringLength)
+  let reason = ret.substr(138, stringLength * 2)
+  let i = 0
+  while (reason) {
+    buffer[i++] = parseInt(reason.slice(0, 2), 16)
+    reason = reason.slice(2)
+  }
+  return utf8.decode(buffer)
 }
 
 export default getRevertReason
