@@ -18,7 +18,7 @@ function spawnGeth (exe, opts = {}) {
       `--rpc.gascap=${opts.gasCap || 0}`,
       `--rpc.txfeecap=0`,
       '--http',
-      '--http.api=eth',
+      '--http.api=eth,net',
       `--http.addr=${opts.host || '127.0.0.1'}`,
       `--http.port=${opts.port || '8545'}`,
       '--http.corsdomain=*',
