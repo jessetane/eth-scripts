@@ -22,7 +22,7 @@ function spawnGeth (exe, opts = {}) {
       `--http.addr=${opts.host || '127.0.0.1'}`,
       `--http.port=${opts.port || '8545'}`,
       '--http.corsdomain=*',
-      '--http.rpcvhosts=*',
+      '--http.vhosts=*',
       '--nodiscover'
     ]
     const geth = childProcess.spawn(exe, gethOpts)
