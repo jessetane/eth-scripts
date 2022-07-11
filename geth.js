@@ -2,8 +2,8 @@ import childProcess from 'child_process'
 
 let geths = []
 
-process.on('exit', () => {
-  geths.forEach(geth => geth.close())
+process.on('SIGTERM', () => {
+  geths.forEach(geth => geth.done = true)
 })
 
 function spawnGeth (exe, opts = {}) {
@@ -39,14 +39,9 @@ function spawnGeth (exe, opts = {}) {
     })
     geth.on('exit', code => {
       if (!geth.done) {
-        geth.emit('error', new Error('geth crashed with code: ' + code))
+        geth.emit('error', new Error('geth exited unexpectedly with code: ' + code))
       }
     })
-    geth.close = function () {
-      geths = geths.filter(g => g !== geth)
-      geth.done = true
-      geth.kill('SIGINT')
-    }
     geths.push(geth)
   })
 }
