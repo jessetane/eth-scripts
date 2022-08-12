@@ -42,6 +42,11 @@ function spawnGeth (exe, opts = {}) {
         geth.emit('error', new Error('geth exited unexpectedly with code: ' + code))
       }
     })
+    geth.close = function () {
+      geths = geths.filter(g => g !== geth)
+      geth.done = true
+      geth.kill()
+    }
     geths.push(geth)
   })
 }
