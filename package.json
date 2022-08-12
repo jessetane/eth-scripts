@@ -1,6 +1,6 @@
 {
   "name": "eth-scripts",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "type": "module",
   "bin": {
     "download-geth": "download-geth.sh",
