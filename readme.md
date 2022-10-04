@@ -103,6 +103,25 @@ await tx // assume transaction is sent and mined but reverts on chain
 const reason = getRevertReason(provider, tx)
 ```
 
+### Decoding ABIEncoderV2 structs (and BigNumber) in a human friendly way
+```javascript
+import abiv2 from 'eth-scripts/abiv2.js'
+
+const someData = await contract.somePublicViewMethodThatReturnsStruct()
+console.log(someData) /*
+[
+  BigNumber { _hex: '0x2a', _isBigNumber: true },
+  BigNumber { _hex: '0x029a', _isBigNumber: true },
+  BigNumber { _hex: '0x0539', _isBigNumber: true },
+  x: BigNumber { _hex: '0x2a', _isBigNumber: true },
+  y: BigNumber { _hex: '0x029a', _isBigNumber: true },
+  z: BigNumber { _hex: '0x0539', _isBigNumber: true }
+]
+*/
+const shouldConvertBigNumberToNumber = true
+console.log(abiv2(someData, shouldConvertBigNumberToNumber)) // { x: 42, y: 666, z: 1337 }
+```
+
 ### Encoding constructor arguments
 Useful for verifying contracts on Etherscan.
 
