@@ -1,6 +1,11 @@
 function abiv2 (a, shouldRenderBigNumber = false) {
   if (!Array.isArray(a)) {
-    if (shouldRenderBigNumber && a._isBigNumber) return a.toNumber()
+    if (a._isBigNumber && shouldRenderBigNumber) {
+    if (typeof shouldRenderBigNumber === 'string') {
+      return a[shouldRenderBigNumber]()
+    } else {
+      return a.toHexString()
+    }
     return a
   }
   const o = {}
