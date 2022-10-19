@@ -1,10 +1,11 @@
 function abiv2 (a, shouldRenderBigNumber = false) {
   if (!Array.isArray(a)) {
     if (a._isBigNumber && shouldRenderBigNumber) {
-    if (typeof shouldRenderBigNumber === 'string') {
-      return a[shouldRenderBigNumber]()
-    } else {
-      return a.toHexString()
+      if (typeof shouldRenderBigNumber === 'string') {
+        return a[shouldRenderBigNumber]()
+      } else {
+        return a.toHexString()
+      }
     }
     return a
   }
